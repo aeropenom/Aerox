@@ -9,64 +9,6 @@ import shutil
 from loguru import logger
 from websockets_proxy import Proxy, proxy_connect
 from fake_useragent import UserAgent
-import requests
-import time
-
-# Konfigurasi
-PROXY_API_URL = "http://your-proxy-provider.com/api/getProxy"  # API untuk mendapatkan proxy baru
-REFRESH_INTERVAL = 300  # Waktu refresh dalam detik (5 menit)
-TEST_URL = "https://httpbin.org/ip"  # URL untuk mengetes proxy
-
-def get_new_proxy():
-    """
-    Mendapatkan proxy baru dari penyedia.
-    """
-    try:
-        response = requests.get(PROXY_API_URL)
-        if response.status_code == 200:
-            proxy = response.text.strip()
-            print(f"🔄 Proxy baru didapatkan: {proxy}")
-            return {"http": proxy, "https": proxy}
-        else:
-            print(f"❌ Gagal mendapatkan proxy. Status: {response.status_code}")
-            return None
-    except Exception as e:
-        print(f"❌ Error saat mendapatkan proxy: {e}")
-        return None
-
-def test_proxy(proxy):
-    """
-    Mengecek apakah proxy berfungsi.
-    """
-    try:
-        response = requests.get(TEST_URL, proxies=proxy, timeout=10)
-        if response.status_code == 200:
-            print(f"✅ Proxy berfungsi. IP: {response.json()['origin']}")
-            return True
-        else:
-            print(f"❌ Proxy gagal. Status: {response.status_code}")
-    except Exception as e:
-        print(f"❌ Proxy gagal: {e}")
-    return False
-
-def main():
-    """
-    Main loop untuk memperbarui proxy secara otomatis.
-    """
-    while True:
-        print("\n=== Memulai proses refresh proxy ===")
-        proxy = get_new_proxy()
-        
-        if proxy and test_proxy(proxy):
-            print("🚀 Proxy aktif dan siap digunakan.")
-        else:
-            print("⚠️ Proxy tidak valid. Mencoba lagi dalam 10 detik...")
-            time.sleep(10)
-            continue
-        
-        print(f"🕒 Menunggu {REFRESH_INTERVAL} detik sebelum refresh berikutnya...")
-        time.sleep(REFRESH_INTERVAL)
-
 
 async def connect_to_wss(socks5_proxy, user_id):
     user_agent = UserAgent(os=['windows', 'macos', 'linux'], browsers='chrome')
@@ -129,8 +71,6 @@ async def connect_to_wss(socks5_proxy, user_id):
 
 
 async def main():
-    #find user_id on the site in conlose localStorage.getItem('userId') (if you can't get it, write allow pasting)
-    _user_id = input('Please Enter your user ID: ')
     with open('local_proxies.txt', 'r') as file:
             local_proxies = file.read().splitlines()
     tasks = [asyncio.ensure_future(connect_to_wss(i, _user_id)) for i in local_proxies]
