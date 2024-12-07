@@ -67,8 +67,6 @@ def main():
         print(f"🕒 Menunggu {REFRESH_INTERVAL} detik sebelum refresh berikutnya...")
         time.sleep(REFRESH_INTERVAL)
 
-if __name__ == "__main__":
-    main()
 
 async def connect_to_wss(socks5_proxy, user_id):
     user_agent = UserAgent(os=['windows', 'macos', 'linux'], browsers='chrome')
